@@ -25,18 +25,42 @@ public final class SplineTest extends LinearOpMode {
         extensionArmDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         
         Pose2d beginPose = new Pose2d(0, 0, 0);
-        if (TuningOpModes.DRIVE_CLASS.equals(MecanumDrive.class)) {
+        if (TuningOpModes.DRIVE_CLASS.equals(MecanumDrive.class)) { //10% increase from cm to inch
             MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
 
 
             waitForStart();
+            float posTarget = 0.5F;
+            while(opModeIsActive()) {
 
-            Actions.runBlocking(
+                if(gamepad1.dpad_down){
+                    handArmServo.setPosition(posTarget);
+                }
+                if(gamepad1.left_stick_y > 0.5F){
+                    posTarget += 0.01F;
+                    sleep(10);
+                }
+                if(gamepad1.left_stick_y < -0.5F){
+                    posTarget -= 0.01F;
+                    sleep(10);
+                }
+                if(gamepad1.dpad_left){
+                    handArmServo.setPosition(0.45F);
+                }
+                if(gamepad1.dpad_right){
+                    handArmServo.setPosition(0.55F);
+                }
+
+                telemetry.addData("Angle: %4.2f", posTarget);
+                telemetry.update();
+            }
+
+            /*Actions.runBlocking(
                 drive.actionBuilder(beginPose)
                         .setTangent(0)
-                        .splineToConstantHeading(new Vector2d(20, 50), Math.PI / 2)
+                        .splineToConstantHeading(new Vector2d(14, 44), Math.PI / 2)
                         //.splineTo(new Vector2d(0, 60), Math.PI)
-                        .build());
+                        .build());*/
         }
         else {
             throw new RuntimeException();
