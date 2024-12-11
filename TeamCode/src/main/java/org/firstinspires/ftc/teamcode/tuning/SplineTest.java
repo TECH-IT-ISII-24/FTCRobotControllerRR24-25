@@ -55,12 +55,12 @@ public final class SplineTest extends LinearOpMode {
                 telemetry.update();
             }
 
-            /*Actions.runBlocking(
+            Actions.runBlocking(
                 drive.actionBuilder(beginPose)
                         .setTangent(0)
                         .splineToConstantHeading(new Vector2d(14, 44), Math.PI / 2)
                         //.splineTo(new Vector2d(0, 60), Math.PI)
-                        .build());*/
+                        .build());
         }
         else {
             throw new RuntimeException();
