@@ -30,30 +30,7 @@ public final class SplineTest extends LinearOpMode {
 
 
             waitForStart();
-            float posTarget = 0.5F;
-            while(opModeIsActive()) {
-
-                if(gamepad1.dpad_down){
-                    handArmServo.setPosition(posTarget);
-                }
-                if(gamepad1.left_stick_y > 0.5F){
-                    posTarget += 0.01F;
-                    sleep(10);
-                }
-                if(gamepad1.left_stick_y < -0.5F){
-                    posTarget -= 0.01F;
-                    sleep(10);
-                }
-                if(gamepad1.dpad_left){
-                    handArmServo.setPosition(0.45F);
-                }
-                if(gamepad1.dpad_right){
-                    handArmServo.setPosition(0.55F);
-                }
-
-                telemetry.addData("Angle: %4.2f", posTarget);
-                telemetry.update();
-            }
+            
 
             Actions.runBlocking(
                 drive.actionBuilder(beginPose)
