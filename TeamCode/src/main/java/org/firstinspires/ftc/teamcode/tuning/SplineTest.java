@@ -1,6 +1,10 @@
 package org.firstinspires.ftc.teamcode.tuning;
 
+import com.acmerobotics.roadrunner.AngularVelConstraint;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.ProfileAccelConstraint;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
+import com.acmerobotics.roadrunner.TurnConstraints;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -33,9 +37,10 @@ public final class SplineTest extends LinearOpMode {
             Actions.runBlocking(
                 drive.actionBuilder(beginPose)
                         .setTangent(0)
-                        .splineToConstantHeading(new Vector2d(15, 340), Math.PI / 2)
+                        .splineToConstantHeading(new Vector2d(15, 40), Math.PI / 2,new TranslationalVelConstraint(20.0))
                         //.splineTo(new Vector2d(0, 60), Math.PI)
-
+                        .turn(Math.toRadians(-135))
+                        .lineToX(8)
                         .build());
         }
         else {

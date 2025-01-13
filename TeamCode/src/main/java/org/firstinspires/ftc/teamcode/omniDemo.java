@@ -32,7 +32,9 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /*
@@ -63,7 +65,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Basic: Omni Linear OpMode", group="Linear OpMode")
+@TeleOp(name="MainCodeARMTEST", group="Testing")
 public class omniDemo extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
@@ -72,6 +74,12 @@ public class omniDemo extends LinearOpMode {
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
+
+    private DcMotor extensionArmDrive = null;
+
+    private CRServo scoopServo = null;
+
+    private DigitalChannel DigChannel = null;
 
     @Override
     public void runOpMode() {
@@ -82,6 +90,9 @@ public class omniDemo extends LinearOpMode {
         leftBackDrive  = hardwareMap.get(DcMotor.class, "left_back_drive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
+        extensionArmDrive = hardwareMap.get(DcMotor.class, "extension_arm_drive");
+        scoopServo = hardwareMap.get(CRServo.class, "scoop_servo");
+        DigChannel = hardwareMap.get(DigitalChannel.class, "sensor_digital");
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -109,6 +120,25 @@ public class omniDemo extends LinearOpMode {
         while (opModeIsActive()) {
             double max;
 
+            if(gamepad1.dpad_down){
+                extensionArmDrive.setPower(1);
+            }
+            else if(gamepad1.dpad_up){
+                extensionArmDrive.setPower(-0.8);
+            }
+            else{
+                extensionArmDrive.setPower(0);
+            }
+
+            if(gamepad1.dpad_left){
+                scoopServo.setPower(1);
+            }
+            else if(gamepad1.dpad_right){
+                scoopServo.setPower(-1);
+            }
+            else{
+                scoopServo.setPower(0);
+            }
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
             double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
             double lateral =  gamepad1.left_stick_x;
@@ -161,6 +191,7 @@ public class omniDemo extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
+            telemetry.addData("Touch Sensor", "Touching? " + DigChannel.getState());
             telemetry.update();
         }
     }}
