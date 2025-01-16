@@ -121,7 +121,13 @@ public class omniDemo extends LinearOpMode {
             double max;
 
             if(gamepad1.dpad_down){
-                extensionArmDrive.setPower(1);
+
+                if(DigChannel.getState()){
+                    extensionArmDrive.setPower(0);
+                }
+                else{
+                    extensionArmDrive.setPower(1);
+                }
             }
             else if(gamepad1.dpad_up){
                 extensionArmDrive.setPower(-0.8);
@@ -139,6 +145,8 @@ public class omniDemo extends LinearOpMode {
             else{
                 scoopServo.setPower(0);
             }
+
+
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
             double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
             double lateral =  gamepad1.left_stick_x;
