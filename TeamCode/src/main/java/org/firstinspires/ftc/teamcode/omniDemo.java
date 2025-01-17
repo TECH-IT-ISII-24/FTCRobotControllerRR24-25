@@ -34,6 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -105,12 +106,17 @@ public class omniDemo extends LinearOpMode {
         // Reverse the direction (flip FORWARD <-> REVERSE ) of any wheel that runs backward
         // Keep testing until ALL the wheels move the robot forward when you push the left joystick forward.
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
         // Wait for the game to start (driver presses START)
-        telemetry.addData("Status", "Initialized");
+        telemetry.addData("Status", "Resetting Arm...");
+        telemetry.update();
+
+
+
+        telemetry.addData("Status", "Hot and ready!");
         telemetry.update();
 
         waitForStart();
@@ -122,7 +128,7 @@ public class omniDemo extends LinearOpMode {
 
             if(gamepad1.dpad_down){
 
-                if(DigChannel.getState()){
+                if(!DigChannel.getState()){
                     extensionArmDrive.setPower(0);
                 }
                 else{
@@ -199,7 +205,7 @@ public class omniDemo extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
-            telemetry.addData("Touch Sensor", "Touching? " + DigChannel.getState());
+            telemetry.addData("Touch Sensor", "State zero? " + DigChannel.getState());
             telemetry.update();
         }
     }}
