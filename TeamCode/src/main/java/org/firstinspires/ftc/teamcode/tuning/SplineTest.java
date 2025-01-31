@@ -39,8 +39,7 @@ public final class SplineTest extends LinearOpMode {
                         .setTangent(0)
                         .splineToConstantHeading(new Vector2d(15, 40), Math.PI / 2,new TranslationalVelConstraint(20.0))
                         //.splineTo(new Vector2d(0, 60), Math.PI)
-                        .turn(Math.toRadians(-135))
-                        .lineToX(8)
+
                         .build());
         }
         else {
