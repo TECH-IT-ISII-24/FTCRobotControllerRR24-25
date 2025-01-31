@@ -92,7 +92,7 @@ public class omniDemo extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
         extensionArmDrive = hardwareMap.get(DcMotor.class, "extension_arm_drive");
-        scoopServo = hardwareMap.get(CRServo.class, "scoop_servo");
+        //scoopServo = hardwareMap.get(CRServo.class, "scoop_servo");
         DigChannel = hardwareMap.get(DigitalChannel.class, "sensor_digital");
 
         // ########################################################################################
@@ -127,30 +127,25 @@ public class omniDemo extends LinearOpMode {
             double max;
 
             if(gamepad1.dpad_down){
+                
+                extensionArmDrive.setPower(1);
 
-                if(!DigChannel.getState()){
-                    extensionArmDrive.setPower(0);
-                }
-                else{
-                    extensionArmDrive.setPower(1);
-                }
             }
             else if(gamepad1.dpad_up){
-                extensionArmDrive.setPower(-0.8);
-            }
+                if(DigChannel.getState()) {
+                    extensionArmDrive.setPower(-0.8);
+                }
+                else{
+                    extensionArmDrive.setPower(0);
+                }
+
+
+        }
             else{
                 extensionArmDrive.setPower(0);
             }
 
-            if(gamepad1.dpad_left){
-                scoopServo.setPower(1);
-            }
-            else if(gamepad1.dpad_right){
-                scoopServo.setPower(-1);
-            }
-            else{
-                scoopServo.setPower(0);
-            }
+
 
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
