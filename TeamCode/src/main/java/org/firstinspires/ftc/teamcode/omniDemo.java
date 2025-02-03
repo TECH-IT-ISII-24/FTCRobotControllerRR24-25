@@ -127,7 +127,7 @@ public class omniDemo extends LinearOpMode {
             double max;
 
             if(gamepad1.dpad_down){
-                
+                //Arm
                 extensionArmDrive.setPower(1);
 
             }
