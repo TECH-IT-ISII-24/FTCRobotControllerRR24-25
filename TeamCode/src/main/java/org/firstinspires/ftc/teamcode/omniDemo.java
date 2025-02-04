@@ -36,6 +36,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /*
@@ -76,6 +77,10 @@ public class omniDemo extends LinearOpMode {
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
 
+    private DcMotor sliderDrive = null;
+    private Servo rightRotationServo = null;
+    private Servo leftRotationServo = null;
+
     private DcMotor extensionArmDrive = null;
 
     private CRServo scoopServo = null;
@@ -93,6 +98,10 @@ public class omniDemo extends LinearOpMode {
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
         extensionArmDrive = hardwareMap.get(DcMotor.class, "extension_arm_drive");
         //scoopServo = hardwareMap.get(CRServo.class, "scoop_servo");
+        sliderDrive = hardwareMap.get(DcMotor.class, "slider_drive");
+        leftRotationServo = hardwareMap.get(Servo.class, "left_rotation_servo");
+        rightRotationServo = hardwareMap.get(Servo.class, "right_rotation_servo");
+
         DigChannel = hardwareMap.get(DigitalChannel.class, "sensor_digital");
 
         // ########################################################################################
@@ -125,7 +134,23 @@ public class omniDemo extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             double max;
-
+            if(gamepad1.left_bumper){
+                leftRotationServo.setPosition(leftRotationServo.getPosition() + 1);
+                rightRotationServo.setPosition(rightRotationServo.getPosition() - 1);
+            }
+            else if(gamepad1.right_bumper){
+                leftRotationServo.setPosition(leftRotationServo.getPosition() - 1);
+                rightRotationServo.setPosition(rightRotationServo.getPosition() + 1);
+            }
+            if(gamepad1.left_trigger > 0.75){
+                sliderDrive.setPower(0.2);
+            }
+            else if(gamepad1.right_trigger > 0.75){
+                sliderDrive.setPower(-0.2);
+            }
+            else{
+                sliderDrive.setPower(0);
+            }
             if(gamepad1.dpad_down){
                 //Arm
                 extensionArmDrive.setPower(1);
