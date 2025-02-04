@@ -78,10 +78,11 @@ public class omniDemo extends LinearOpMode {
     private DcMotor rightBackDrive = null;
 
     private DcMotor sliderDrive = null;
-    private Servo rightRotationServo = null;
-    private Servo leftRotationServo = null;
+    private CRServo rightRotationServo = null;
+    private CRServo leftRotationServo = null;
 
     private DcMotor extensionArmDrive = null;
+
 
     private CRServo scoopServo = null;
 
@@ -99,8 +100,8 @@ public class omniDemo extends LinearOpMode {
         extensionArmDrive = hardwareMap.get(DcMotor.class, "extension_arm_drive");
         //scoopServo = hardwareMap.get(CRServo.class, "scoop_servo");
         sliderDrive = hardwareMap.get(DcMotor.class, "slider_drive");
-        leftRotationServo = hardwareMap.get(Servo.class, "left_rotation_servo");
-        rightRotationServo = hardwareMap.get(Servo.class, "right_rotation_servo");
+        leftRotationServo = hardwareMap.get(CRServo.class, "left_rotation_servo");
+        rightRotationServo = hardwareMap.get(CRServo.class, "right_rotation_servo");
 
         DigChannel = hardwareMap.get(DigitalChannel.class, "sensor_digital");
 
@@ -135,12 +136,16 @@ public class omniDemo extends LinearOpMode {
         while (opModeIsActive()) {
             double max;
             if(gamepad1.left_bumper){
-                leftRotationServo.setPosition(leftRotationServo.getPosition() + 1);
-                rightRotationServo.setPosition(rightRotationServo.getPosition() - 1);
+                leftRotationServo.setPower(0.5);
+                rightRotationServo.setPower(-0.5);
             }
             else if(gamepad1.right_bumper){
-                leftRotationServo.setPosition(leftRotationServo.getPosition() - 1);
-                rightRotationServo.setPosition(rightRotationServo.getPosition() + 1);
+                leftRotationServo.setPower(-0.5);
+                rightRotationServo.setPower(0.5);
+            }
+            else{
+                leftRotationServo.setPower(0);
+                rightRotationServo.setPower(0);
             }
             if(gamepad1.left_trigger > 0.75){
                 sliderDrive.setPower(0.2);
@@ -168,6 +173,16 @@ public class omniDemo extends LinearOpMode {
         }
             else{
                 extensionArmDrive.setPower(0);
+            }
+
+            if(gamepad1.dpad_right){
+                sliderDrive.setPower(0.75);
+            }
+            else if(gamepad1.dpad_left){
+                sliderDrive.setPower(-0.75);
+            }
+            else{
+                sliderDrive.setPower(0);
             }
 
 
