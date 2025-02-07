@@ -77,16 +77,19 @@ public class omniDemo extends LinearOpMode {
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
 
-    private DcMotor sliderDrive = null;
-    private CRServo rightRotationServo = null;
-    private CRServo leftRotationServo = null;
+    //private DcMotor sliderDrive = null;
+
 
     private DcMotor extensionArmDrive = null;
 
 
     private CRServo scoopServo = null;
 
+    private DcMotor rotationDrive = null;
+
     private DigitalChannel DigChannel = null;
+
+    private DcMotor rotationDrive2 = null;
 
     @Override
     public void runOpMode() {
@@ -99,11 +102,14 @@ public class omniDemo extends LinearOpMode {
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
         extensionArmDrive = hardwareMap.get(DcMotor.class, "extension_arm_drive");
         //scoopServo = hardwareMap.get(CRServo.class, "scoop_servo");
-        sliderDrive = hardwareMap.get(DcMotor.class, "slider_drive");
-        leftRotationServo = hardwareMap.get(CRServo.class, "left_rotation_servo");
-        rightRotationServo = hardwareMap.get(CRServo.class, "right_rotation_servo");
+        //sliderDrive = hardwareMap.get(DcMotor.class, "slider_drive");
+        rotationDrive = hardwareMap.get(DcMotor.class, "left_rotation_drive");
+
+
 
         DigChannel = hardwareMap.get(DigitalChannel.class, "sensor_digital");
+
+
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -128,70 +134,68 @@ public class omniDemo extends LinearOpMode {
 
         telemetry.addData("Status", "Hot and ready!");
         telemetry.update();
+        rotationDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        while(DigChannel.getState()){
+            extensionArmDrive.setPower(0.2);
+        }
+        extensionArmDrive.setPower(0);
+        extensionArmDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        extensionArmDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         waitForStart();
         runtime.reset();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             double max;
+
             if(gamepad1.left_bumper){
-                leftRotationServo.setPower(0.5);
-                rightRotationServo.setPower(-0.5);
+                rotationDrive.setPower(0.25);
             }
             else if(gamepad1.right_bumper){
-                leftRotationServo.setPower(-0.5);
-                rightRotationServo.setPower(0.5);
+                rotationDrive.setPower(-0.25);
             }
             else{
-                leftRotationServo.setPower(0);
-                rightRotationServo.setPower(0);
+                rotationDrive.setPower(0);
             }
-            if(gamepad1.left_trigger > 0.75){
-                sliderDrive.setPower(0.2);
-            }
-            else if(gamepad1.right_trigger > 0.75){
-                sliderDrive.setPower(-0.2);
-            }
-            else{
-                sliderDrive.setPower(0);
-            }
+
             if(gamepad1.dpad_down){
                 //Arm
-                extensionArmDrive.setPower(1);
-
-            }
-            else if(gamepad1.dpad_up){
                 if(DigChannel.getState()) {
-                    extensionArmDrive.setPower(-0.8);
+                    extensionArmDrive.setPower(0.2);
                 }
                 else{
                     extensionArmDrive.setPower(0);
+                    extensionArmDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    extensionArmDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 }
 
 
-        }
+            }
+            else if(gamepad1.dpad_up){
+                if(extensionArmDrive.getCurrentPosition() > -3200)
+                    extensionArmDrive.setPower(-0.7);
+                else{
+                    extensionArmDrive.setPower(0);
+
+
+                }
+
+
+            }
             else{
                 extensionArmDrive.setPower(0);
             }
 
-            if(gamepad1.dpad_right){
-                sliderDrive.setPower(0.75);
-            }
-            else if(gamepad1.dpad_left){
-                sliderDrive.setPower(-0.75);
-            }
-            else{
-                sliderDrive.setPower(0);
-            }
+
 
 
 
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double lateral =  gamepad1.left_stick_x;
-            double yaw     =  gamepad1.right_stick_x;
+            double yaw   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+            double lateral =  -gamepad1.left_stick_x;
+            double axial     =  -gamepad1.right_stick_x; //axial
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
@@ -241,6 +245,8 @@ public class omniDemo extends LinearOpMode {
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
             telemetry.addData("Touch Sensor", "State zero? " + DigChannel.getState());
+            telemetry.addData("Extension Ticks:", "Ticks:" + extensionArmDrive.getCurrentPosition());
+            telemetry.addData("Button Interrupt", "Pressed? " + gamepad1.a);
             telemetry.update();
         }
     }}
