@@ -29,14 +29,11 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /*
@@ -67,7 +64,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="MainCodeARMTEST", group="Testing")
+@TeleOp(name="MainCode", group="FINAL")
 public class omniDemo extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
@@ -77,7 +74,7 @@ public class omniDemo extends LinearOpMode {
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
 
-    //private DcMotor sliderDrive = null;
+    private DcMotor extensionScoopDrive = null;
 
 
     private DcMotor extensionArmDrive = null;
@@ -85,11 +82,13 @@ public class omniDemo extends LinearOpMode {
 
     private CRServo scoopServo = null;
 
-    private DcMotor rotationDrive = null;
 
-    private DigitalChannel DigChannel = null;
 
-    private DcMotor rotationDrive2 = null;
+    private DigitalChannel extensionArmSensor = null;
+
+    private DcMotor rotationArmDrive = null;
+
+    private DigitalChannel extensionScoopSensor = null;
 
     @Override
     public void runOpMode() {
@@ -101,13 +100,14 @@ public class omniDemo extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
         extensionArmDrive = hardwareMap.get(DcMotor.class, "extension_arm_drive");
-        //scoopServo = hardwareMap.get(CRServo.class, "scoop_servo");
+        extensionScoopDrive = hardwareMap.get(DcMotor.class, "extension_scoop_drive");
         //sliderDrive = hardwareMap.get(DcMotor.class, "slider_drive");
-        rotationDrive = hardwareMap.get(DcMotor.class, "left_rotation_drive");
+        //rotationArmDrive = hardwareMap.get(DcMotor.class, "rotation_arm_drive");
 
 
 
-        DigChannel = hardwareMap.get(DigitalChannel.class, "sensor_digital");
+        extensionArmSensor = hardwareMap.get(DigitalChannel.class, "arm_sensor");
+        extensionScoopSensor = hardwareMap.get(DigitalChannel.class, "scoop_sensor");
 
 
 
@@ -132,16 +132,19 @@ public class omniDemo extends LinearOpMode {
 
 
 
-        telemetry.addData("Status", "Hot and ready!");
-        telemetry.update();
-        rotationDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        while(DigChannel.getState()){
+        //rotationDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        while(extensionArmSensor.getState()){
             extensionArmDrive.setPower(0.2);
         }
         extensionArmDrive.setPower(0);
         extensionArmDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         extensionArmDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        telemetry.addData("Status", "Hot and ready!");
+        extensionScoopDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        extensionScoopDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        telemetry.update();
         waitForStart();
         runtime.reset();
 
@@ -149,20 +152,12 @@ public class omniDemo extends LinearOpMode {
         while (opModeIsActive()) {
             double max;
 
-            if(gamepad1.left_bumper){
-                rotationDrive.setPower(0.25);
-            }
-            else if(gamepad1.right_bumper){
-                rotationDrive.setPower(-0.25);
-            }
-            else{
-                rotationDrive.setPower(0);
-            }
+
 
             if(gamepad1.dpad_down){
                 //Arm
-                if(DigChannel.getState()) {
-                    extensionArmDrive.setPower(0.2);
+                if(extensionArmSensor.getState()) {
+                    extensionArmDrive.setPower(0.75);
                 }
                 else{
                     extensionArmDrive.setPower(0);
@@ -177,15 +172,36 @@ public class omniDemo extends LinearOpMode {
                     extensionArmDrive.setPower(-0.7);
                 else{
                     extensionArmDrive.setPower(0);
-
-
                 }
-
-
             }
             else{
                 extensionArmDrive.setPower(0);
             }
+
+            if(gamepad1.a){
+                //Arm
+                if(true) {
+                    extensionScoopDrive.setPower(0.5);
+                }
+                else{
+                    extensionScoopDrive.setPower(0);
+                    extensionScoopDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    extensionScoopDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                }
+
+
+            }
+            else if(gamepad1.y){
+                extensionScoopDrive.setPower(-0.5);
+            }
+            else{
+                extensionScoopDrive.setPower(0);
+            }
+
+
+
+
+
 
 
 
@@ -193,9 +209,9 @@ public class omniDemo extends LinearOpMode {
 
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double yaw   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double lateral =  -gamepad1.left_stick_x;
-            double axial     =  -gamepad1.right_stick_x; //axial
+            double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+            double lateral =  gamepad1.left_stick_x;
+            double yaw     =  gamepad1.right_stick_x; //axial
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
@@ -244,9 +260,16 @@ public class omniDemo extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
-            telemetry.addData("Touch Sensor", "State zero? " + DigChannel.getState());
-            telemetry.addData("Extension Ticks:", "Ticks:" + extensionArmDrive.getCurrentPosition());
-            telemetry.addData("Button Interrupt", "Pressed? " + gamepad1.a);
+            telemetry.addData("Arm Sensor", "Extended? " + extensionArmSensor.getState());
+            telemetry.addData("Scoop Sensor", "Extended? " + extensionScoopSensor.getState());
+            telemetry.addData("Arm Ticks:", "Ticks:" + extensionArmDrive.getCurrentPosition());
+            telemetry.addData("Scoop Ticks:", "Ticks:" + extensionScoopDrive.getCurrentPosition());
+
+
             telemetry.update();
         }
+
+
     }}
+
+
