@@ -95,6 +95,8 @@ public class omniDemo extends LinearOpMode {
 
     private Servo clawRotationServo = null;
 
+    private Servo armOpeningServo = null;
+
     @Override
     public void runOpMode() {
 
@@ -108,10 +110,17 @@ public class omniDemo extends LinearOpMode {
         extensionScoopDrive = hardwareMap.get(DcMotor.class, "extension_scoop_drive");
         clawOpeningServo = hardwareMap.get(Servo.class, "claw_opening_servo");
         clawRotationServo = hardwareMap.get(Servo.class, "claw_rotation_servo");
-        //sliderDrive = hardwareMap.get(DcMotor.class, "slider_drive");
+        armOpeningServo = hardwareMap.get(Servo.class, "arm_opening_servo");
         rotationArmDrive = hardwareMap.get(DcMotor.class, "rotation_arm_drive");
 
-        clawOpeningServo.scaleRange(0, 1);
+
+        clawOpeningServo.scaleRange(0, 0.32);
+        clawOpeningServo.setPosition(0);
+        clawRotationServo.scaleRange(0,0.85);
+        clawRotationServo.setPosition(0);
+        armOpeningServo.scaleRange(0,1);
+        armOpeningServo.setPosition(0);
+
 
 
         extensionArmSensor = hardwareMap.get(DigitalChannel.class, "arm_sensor");
@@ -217,22 +226,31 @@ public class omniDemo extends LinearOpMode {
                 extensionScoopDrive.setPower(0);
             }
 
-            if(gamepad1.b){
-                clawRotationServo.setPosition(0.2);
-            }
-            else if(gamepad1.x){
-                clawRotationServo.setPosition(0);
-            }
+
 
             if(gamepad1.left_bumper){
-                rotationArmDrive.setPower(0.40);
+                clawRotationServo.setPosition(0);
             }
             else if(gamepad1.right_bumper){
-                rotationArmDrive.setPower(-0.40);
+                clawRotationServo.setPosition(1);
             }
-            else{
-                rotationArmDrive.setPower(0);
+            if(gamepad2.left_bumper){
+                clawOpeningServo.setPosition(0);
             }
+            else if(gamepad2.right_bumper){
+                clawOpeningServo.setPosition(1);
+            }
+            if(gamepad2.dpad_up){
+                armOpeningServo.setPosition(0);
+            }
+            else if(gamepad2.dpad_down){
+                armOpeningServo.setPosition(1);
+            }
+
+
+
+
+
 
 
 
