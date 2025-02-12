@@ -91,7 +91,9 @@ public class omniDemo extends LinearOpMode {
 
     private DigitalChannel extensionScoopSensor = null;
 
-    private Servo clawServo = null;
+    private Servo clawOpeningServo = null;
+
+    private Servo clawRotationServo = null;
 
     @Override
     public void runOpMode() {
@@ -104,10 +106,12 @@ public class omniDemo extends LinearOpMode {
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
         extensionArmDrive = hardwareMap.get(DcMotor.class, "extension_arm_drive");
         extensionScoopDrive = hardwareMap.get(DcMotor.class, "extension_scoop_drive");
-        clawServo = hardwareMap.get(Servo.class, "claw_servo");
+        clawOpeningServo = hardwareMap.get(Servo.class, "claw_opening_servo");
+        clawRotationServo = hardwareMap.get(Servo.class, "claw_rotation_servo");
         //sliderDrive = hardwareMap.get(DcMotor.class, "slider_drive");
-        //rotationArmDrive = hardwareMap.get(DcMotor.class, "rotation_arm_drive");
+        rotationArmDrive = hardwareMap.get(DcMotor.class, "rotation_arm_drive");
 
+        clawOpeningServo.scaleRange(0, 1);
 
 
         extensionArmSensor = hardwareMap.get(DigitalChannel.class, "arm_sensor");
@@ -148,6 +152,7 @@ public class omniDemo extends LinearOpMode {
         telemetry.addData("Status", "Hot and ready!");
         extensionScoopDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         extensionScoopDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rotationArmDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         telemetry.update();
         waitForStart();
         runtime.reset();
@@ -185,13 +190,12 @@ public class omniDemo extends LinearOpMode {
             if(gamepad1.a){
                 //Arm
                 if(extensionScoopSensor.getState()) {
-                    if(extensionScoopDrive.getCurrentPosition() > -250){
+                    if (extensionScoopDrive.getCurrentPosition() > -250) {
                         extensionScoopDrive.setPower(0.25);
                     }
-                    else{
-                        extensionScoopDrive.setPower(0.5);
+                    else {
+                        extensionScoopDrive.setPower(0.60);
                     }
-
                 }
                 else{
                     extensionScoopDrive.setPower(0);
@@ -211,6 +215,23 @@ public class omniDemo extends LinearOpMode {
             }
             else{
                 extensionScoopDrive.setPower(0);
+            }
+
+            if(gamepad1.b){
+                clawRotationServo.setPosition(0.2);
+            }
+            else if(gamepad1.x){
+                clawRotationServo.setPosition(0);
+            }
+
+            if(gamepad1.left_bumper){
+                rotationArmDrive.setPower(0.40);
+            }
+            else if(gamepad1.right_bumper){
+                rotationArmDrive.setPower(-0.40);
+            }
+            else{
+                rotationArmDrive.setPower(0);
             }
 
 
@@ -281,7 +302,9 @@ public class omniDemo extends LinearOpMode {
             telemetry.addData("Scoop Sensor", "Extended? " + extensionScoopSensor.getState());
             telemetry.addData("Arm Ticks:", "Ticks:" + extensionArmDrive.getCurrentPosition());
             telemetry.addData("Scoop Ticks:", "Ticks:" + extensionScoopDrive.getCurrentPosition());
-            telemetry.addData("Claw Position:", "Value:" + clawServo.getPosition());
+            telemetry.addData("Claw Opening Position:", "Value:" + clawRotationServo.getPosition());
+            telemetry.addData("X button pressed?", "Value: " + gamepad1.b);
+            telemetry.addData("B button pressed?", "Value: " + gamepad1.x);
 
             telemetry.update();
         }
