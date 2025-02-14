@@ -88,7 +88,7 @@ public class omniDemo extends LinearOpMode {
 
     private DigitalChannel extensionArmSensor = null;
 
-    private DcMotor rotationArmDrive = null;
+    private Servo rotationArmServo = null;
 
     private DigitalChannel extensionScoopSensor = null;
 
@@ -112,7 +112,7 @@ public class omniDemo extends LinearOpMode {
         clawOpeningServo = hardwareMap.get(Servo.class, "claw_opening_servo");
         clawRotationServo = hardwareMap.get(Servo.class, "claw_rotation_servo");
         armOpeningServo = hardwareMap.get(Servo.class, "arm_opening_servo");
-        rotationArmDrive = hardwareMap.get(DcMotor.class, "rotation_arm_drive");
+        rotationArmServo = hardwareMap.get(Servo.class, "rotation_arm_servo");
 
 
         clawOpeningServo.scaleRange(0, 0.32);
@@ -121,10 +121,9 @@ public class omniDemo extends LinearOpMode {
         clawRotationServo.setPosition(0);
         armOpeningServo.scaleRange(0,1);
         armOpeningServo.setPosition(1);
+        rotationArmServo.scaleRange(0,0.965);
+        rotationArmServo.setPosition(0);
 
-        rotationArmDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); //-430 ticks
-        rotationArmDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rotationArmDrive.setDirection(DcMotor.Direction.REVERSE);
 
 
 
@@ -253,23 +252,13 @@ public class omniDemo extends LinearOpMode {
                 armOpeningServo.setPosition(1);
             }
             if(gamepad2.y){
-
-                rotationArmDrive.setPower(0);
-                rotationArmDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                rotationArmDrive.setTargetPosition(415);
-                rotationArmDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                rotationArmDrive.setPower(-0.6);
-
-
-
+                rotationArmServo.setPosition(0);
             }
             else if(gamepad2.a){
-                rotationArmDrive.setPower(0);
-                rotationArmDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                rotationArmDrive.setTargetPosition(260);
-                rotationArmDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                rotationArmDrive.setPower(0.6);
-
+                rotationArmServo.setPosition(1);
+            }
+            else if(gamepad2.x){
+                rotationArmServo.setPosition(0.5);
 
             }
 
@@ -331,7 +320,7 @@ public class omniDemo extends LinearOpMode {
             telemetry.addData("Arm Extension Ticks:", "Ticks:" + extensionArmDrive.getCurrentPosition());
             telemetry.addData("Scoop Ticks:", "Ticks:" + extensionScoopDrive.getCurrentPosition());
             telemetry.addData("Claw Opening Position:", "Value:" + clawRotationServo.getPosition());
-            telemetry.addData("Arm Rotation Ticks:", "Value:" + rotationArmDrive.getCurrentPosition());
+            telemetry.addData("Arm Rotation Ticks:", "Value:" + rotationArmServo.getPosition());
 
 
             telemetry.update();
