@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -119,7 +120,12 @@ public class omniDemo extends LinearOpMode {
         clawRotationServo.scaleRange(0,0.85);
         clawRotationServo.setPosition(0);
         armOpeningServo.scaleRange(0,1);
-        armOpeningServo.setPosition(0);
+        armOpeningServo.setPosition(1);
+
+        rotationArmDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); //-430 ticks
+        rotationArmDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rotationArmDrive.setDirection(DcMotor.Direction.REVERSE);
+
 
 
 
@@ -161,7 +167,7 @@ public class omniDemo extends LinearOpMode {
         telemetry.addData("Status", "Hot and ready!");
         extensionScoopDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         extensionScoopDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rotationArmDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //rotationArmDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         telemetry.update();
         waitForStart();
         runtime.reset();
@@ -232,7 +238,7 @@ public class omniDemo extends LinearOpMode {
                 clawRotationServo.setPosition(0);
             }
             else if(gamepad1.right_bumper){
-                clawRotationServo.setPosition(1);
+                clawRotationServo.setPosition(0.95);
             }
             if(gamepad2.left_bumper){
                 clawOpeningServo.setPosition(0);
@@ -246,22 +252,26 @@ public class omniDemo extends LinearOpMode {
             else if(gamepad2.dpad_down){
                 armOpeningServo.setPosition(1);
             }
+            if(gamepad2.y){
+
+                rotationArmDrive.setPower(0);
+                rotationArmDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                rotationArmDrive.setTargetPosition(415);
+                rotationArmDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                rotationArmDrive.setPower(-0.6);
 
 
 
+            }
+            else if(gamepad2.a){
+                rotationArmDrive.setPower(0);
+                rotationArmDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                rotationArmDrive.setTargetPosition(260);
+                rotationArmDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                rotationArmDrive.setPower(0.6);
 
 
-
-
-
-
-
-
-
-
-
-
-
+            }
 
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
@@ -318,11 +328,11 @@ public class omniDemo extends LinearOpMode {
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
             telemetry.addData("Arm Sensor", "Extended? " + extensionArmSensor.getState());
             telemetry.addData("Scoop Sensor", "Extended? " + extensionScoopSensor.getState());
-            telemetry.addData("Arm Ticks:", "Ticks:" + extensionArmDrive.getCurrentPosition());
+            telemetry.addData("Arm Extension Ticks:", "Ticks:" + extensionArmDrive.getCurrentPosition());
             telemetry.addData("Scoop Ticks:", "Ticks:" + extensionScoopDrive.getCurrentPosition());
             telemetry.addData("Claw Opening Position:", "Value:" + clawRotationServo.getPosition());
-            telemetry.addData("X button pressed?", "Value: " + gamepad1.b);
-            telemetry.addData("B button pressed?", "Value: " + gamepad1.x);
+            telemetry.addData("Arm Rotation Ticks:", "Value:" + rotationArmDrive.getCurrentPosition());
+
 
             telemetry.update();
         }
