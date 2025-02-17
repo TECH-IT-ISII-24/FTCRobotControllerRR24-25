@@ -149,7 +149,7 @@ public class omniDemo extends LinearOpMode {
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
         // Wait for the game to start (driver presses START)
-        telemetry.addData("Status", "Resetting Arm...");
+        telemetry.addData("Status", "Resetting Positions...");
         telemetry.update();
 
 
@@ -159,6 +159,9 @@ public class omniDemo extends LinearOpMode {
 
         while(extensionArmSensor.getState()){
             extensionArmDrive.setPower(0.2);
+        }
+        while( extensionScoopSensor.getState()){
+            extensionScoopDrive.setPower(0.35);
         }
         extensionArmDrive.setPower(0);
         extensionArmDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -205,7 +208,7 @@ public class omniDemo extends LinearOpMode {
                 //Arm
                 if(extensionScoopSensor.getState()) {
                     if (extensionScoopDrive.getCurrentPosition() > -250) {
-                        extensionScoopDrive.setPower(0.25);
+                        extensionScoopDrive.setPower(0.35);
                     }
                     else {
                         extensionScoopDrive.setPower(0.60);
