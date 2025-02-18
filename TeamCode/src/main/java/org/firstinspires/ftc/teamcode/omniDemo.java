@@ -35,6 +35,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -117,13 +118,14 @@ public class omniDemo extends LinearOpMode {
 
         clawOpeningServo.scaleRange(0, 0.32);
         clawOpeningServo.setPosition(0);
-        clawRotationServo.scaleRange(0,0.85);
-        clawRotationServo.setPosition(0);
+        clawRotationServo.scaleRange(0,0.75);
+        clawRotationServo.setPosition(1);
         armOpeningServo.scaleRange(0,1);
-        armOpeningServo.setPosition(1);
-        rotationArmServo.scaleRange(0,0.965);
+        armOpeningServo.setPosition(0);
+        rotationArmServo.scaleRange(0,0.96);
         rotationArmServo.setPosition(0);
 
+        double correctionRange = 0;
 
 
 
@@ -234,6 +236,21 @@ public class omniDemo extends LinearOpMode {
                 extensionScoopDrive.setPower(0);
             }
 
+            if(gamepad2.right_stick_button){
+                correctionRange = correctionRange +0.0005;
+                if(correctionRange > 0.039){
+                    correctionRange = 0.039;
+                }
+                rotationArmServo.scaleRange(0,0.96 + correctionRange);
+            }
+            else if (gamepad2.left_stick_button){
+                correctionRange = correctionRange - 0.0005;
+                if(correctionRange > 0.039){
+                    correctionRange = 0.039;
+                }
+                rotationArmServo.scaleRange(0,0.96 + correctionRange);
+            }
+
 
 
             if(gamepad2.dpad_down){
@@ -316,14 +333,15 @@ public class omniDemo extends LinearOpMode {
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
-            telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
+            telemetry.addData("Front left/Right", "%4.2f, %4.2f ", leftFrontPower, rightFrontPower);
+            telemetry.addData("Back  left/Right", "%4.2f, %4.2f ", leftBackPower, rightBackPower);
             telemetry.addData("Arm Sensor", "Extended? " + extensionArmSensor.getState());
             telemetry.addData("Scoop Sensor", "Extended? " + extensionScoopSensor.getState());
-            telemetry.addData("Arm Extension Ticks:", "Ticks:" + extensionArmDrive.getCurrentPosition());
+            telemetry.addData("Arm Extension Ticks:", "Ticks: " + extensionArmDrive.getCurrentPosition());
             telemetry.addData("Scoop Ticks:", "Ticks:" + extensionScoopDrive.getCurrentPosition());
-            telemetry.addData("Claw Opening Position:", "Value:" + clawRotationServo.getPosition());
-            telemetry.addData("Arm Rotation Ticks:", "Value:" + rotationArmServo.getPosition());
+            telemetry.addData("Claw Opening Position:", "Value: " + clawRotationServo.getPosition());
+            telemetry.addData("Arm Rotation Ticks:", "Value: " + rotationArmServo.getPosition());
+            telemetry.addData("Arm correction:",  "%4.4f", correctionRange );
 
 
             telemetry.update();
