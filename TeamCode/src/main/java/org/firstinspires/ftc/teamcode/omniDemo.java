@@ -236,10 +236,10 @@ public class omniDemo extends LinearOpMode {
 
 
 
-            if(gamepad1.left_bumper){
+            if(gamepad2.dpad_down){
                 clawRotationServo.setPosition(0);
             }
-            else if(gamepad1.right_bumper){
+            else if(gamepad2.dpad_up){
                 clawRotationServo.setPosition(0.95);
             }
             if(gamepad2.left_bumper){
@@ -248,17 +248,17 @@ public class omniDemo extends LinearOpMode {
             else if(gamepad2.right_bumper){
                 clawOpeningServo.setPosition(1);
             }
-            if(gamepad2.dpad_up){
+            if(gamepad2.dpad_left){
                 armOpeningServo.setPosition(0);
             }
-            else if(gamepad2.dpad_down){
+            else if(gamepad2.dpad_right){
                 armOpeningServo.setPosition(1);
             }
             if(gamepad2.y){
                 rotationArmServo.setPosition(0);
             }
             else if(gamepad2.a){
-                rotationArmServo.setPosition(1);
+                rotationArmServo.setPosition(0.975);
             }
             else if(gamepad2.x){
                 rotationArmServo.setPosition(0.5);
