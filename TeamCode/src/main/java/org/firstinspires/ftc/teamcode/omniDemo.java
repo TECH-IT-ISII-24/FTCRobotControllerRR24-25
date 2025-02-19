@@ -83,9 +83,6 @@ public class omniDemo extends LinearOpMode {
     private DcMotor extensionArmDrive = null;
 
 
-    private CRServo scoopServo = null;
-
-
 
     private DigitalChannel extensionArmSensor = null;
 
@@ -125,7 +122,10 @@ public class omniDemo extends LinearOpMode {
         rotationArmServo.scaleRange(0,0.96);
         rotationArmServo.setPosition(0);
 
-        double correctionRange = 0;
+        double highCorrectionRange = 0;
+        double lowCorrectionRange = 0;
+        boolean isHorizontalResetting = false;
+        boolean isDiagonalResetting = false;
 
 
 
@@ -236,20 +236,63 @@ public class omniDemo extends LinearOpMode {
                 extensionScoopDrive.setPower(0);
             }
 
-            if(gamepad2.right_stick_button){
-                correctionRange = correctionRange +0.0005;
-                if(correctionRange > 0.039){
-                    correctionRange = 0.039;
+            if(gamepad2.left_stick_y < -0.75){
+                highCorrectionRange = highCorrectionRange +0.0005;
+                if(highCorrectionRange > 0.039){
+                    highCorrectionRange = 0.039;
                 }
-                rotationArmServo.scaleRange(0,0.96 + correctionRange);
+                rotationArmServo.scaleRange(0,0.96 + highCorrectionRange);
+                rotationArmServo.setPosition(1);
             }
-            else if (gamepad2.left_stick_button){
-                correctionRange = correctionRange - 0.0005;
-                if(correctionRange > 0.039){
-                    correctionRange = 0.039;
+            else if (gamepad2.left_stick_y > 0.75){
+                highCorrectionRange = highCorrectionRange - 0.0005;
+
+                if(lowCorrectionRange < -0.039){
+                    lowCorrectionRange = -0.039;
                 }
-                rotationArmServo.scaleRange(0,0.96 + correctionRange);
+                rotationArmServo.scaleRange(0,0.96 + highCorrectionRange);
+                rotationArmServo.setPosition(1);
             }
+
+            if(gamepad2.right_stick_y < -0.75){
+                lowCorrectionRange = lowCorrectionRange - 0.0005;
+                if(lowCorrectionRange > 0.039){
+                    lowCorrectionRange = 0.039;
+                }
+
+                clawRotationServo.scaleRange(0,0.75 + highCorrectionRange);
+                clawRotationServo.setPosition(1);
+            }
+            else if (gamepad2.right_stick_y > 0.75){
+                lowCorrectionRange = lowCorrectionRange + 0.0005;
+
+                if(lowCorrectionRange < -0.039){
+                    lowCorrectionRange = -0.039;
+                }
+                clawRotationServo.scaleRange(0,0.75 + lowCorrectionRange);
+                clawRotationServo.setPosition(1);
+            }
+
+            if(gamepad1.left_bumper){
+                isDiagonalResetting = true;
+                extensionArmDrive.setPower(0.5);
+            }
+            if(!extensionArmSensor.getState() && isDiagonalResetting){
+                extensionArmDrive.setPower(0);
+                isDiagonalResetting = false;
+            }
+
+            if(gamepad1.right_bumper){
+                isHorizontalResetting = true;
+                extensionScoopDrive.setPower(0.5);
+            }
+            if(!extensionScoopSensor.getState() && isHorizontalResetting){
+                extensionScoopDrive.setPower(0);
+                isHorizontalResetting = false;
+
+            }
+
+
 
 
 
@@ -332,7 +375,6 @@ public class omniDemo extends LinearOpMode {
             rightBackDrive.setPower(rightBackPower);
 
             // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f ", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f ", leftBackPower, rightBackPower);
             telemetry.addData("Arm Sensor", "Extended? " + extensionArmSensor.getState());
@@ -341,8 +383,8 @@ public class omniDemo extends LinearOpMode {
             telemetry.addData("Scoop Ticks:", "Ticks:" + extensionScoopDrive.getCurrentPosition());
             telemetry.addData("Claw Opening Position:", "Value: " + clawRotationServo.getPosition());
             telemetry.addData("Arm Rotation Ticks:", "Value: " + rotationArmServo.getPosition());
-            telemetry.addData("Arm correction:",  "%4.4f", correctionRange );
-
+            telemetry.addData("Arm correction:",  "%4.4f", highCorrectionRange );
+            telemetry.addData("Rotation correction:",  "%4.4f", lowCorrectionRange );
 
             telemetry.update();
         }
